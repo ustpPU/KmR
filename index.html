@@ -1,0 +1,629 @@
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Global Aplikasi (Storan Awan Masa Nyata)
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'kmr-scoring-app';
+        const FIREBASE_CONFIG = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const INITIAL_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Data Rubrik seperti dalam dokumen
+        const RUBRIC_DATA = [
+            {
+                section: "SUBJEK (10%)",
+                items: [
+                    { id: "s_1", label: "Gabungan Mata pelajaran", max: 2 },
+                    { id: "s_2", label: "The big idea", max: 2 },
+                    { id: "s_3", label: "Aktiviti pembelajaran KMR", max: 2 },
+                    { id: "s_4", label: "Berkongsi dan demonstrasi melalui kefahaman yang jelas tentang konsep", max: 2 },
+                    { id: "s_5", label: "Menerangkan kepentingkan konsep reka bentuk projek", max: 2 }
+                ]
+            },
+            {
+                section: "PENYAMPAIAN (20%)",
+                items: [
+                    { id: "p_1", label: "Kelancaran komunikasi", max: 5 },
+                    { id: "p_2", label: "Pembentangan berkeyakinan", max: 5 },
+                    { id: "p_3", label: "Menarik", max: 5 },
+                    { id: "p_4", label: "Berinformasi", max: 5 }
+                ]
+            },
+            {
+                section: "PRODUK KMR (35%)",
+                items: [
+                    { id: "pr_1", label: "Inovasi bumi hijau/ go green", max: 10 },
+                    { id: "pr_2", label: "Kreatif dan menarik", max: 5 },
+                    { id: "pr_3", label: "Berfungsi dengan baik", max: 5 },
+                    { id: "pr_4", label: "Mesra pengguna", max: 5 },
+                    { id: "pr_5", label: "Praktikal", max: 5 },
+                    { id: "pr_6", label: "Produk yang dihasilkan menepati konsep", max: 5 }
+                ]
+            },
+            {
+                section: "POTENSI (15%)",
+                items: [
+                    { id: "po_1", label: "Berfokus", max: 5 },
+                    { id: "po_2", label: "Penyebarluasan", max: 5 },
+                    { id: "po_3", label: "Perancangan masa depan", max: 5 }
+                ]
+            },
+            {
+                section: "BERIMPAK (10%)",
+                items: [
+                    { id: "i_1", label: "Menyelesaikan masalah", max: 5 },
+                    { id: "i_2", label: "Kepelbagaian guna", max: 5 }
+                ]
+            },
+            {
+                section: "WOW FAKTOR (10%)",
+                items: [
+                    { id: "w_1", label: "Faktor WOW keseluruhan", max: 10 }
+                ]
+            }
+        ];
+
+        const JUDGES = ["Hakim 1", "Hakim 2", "Hakim 3"];
+        const GROUPS = ["Kumpulan 1", "Kumpulan 2", "Kumpulan 3", "Kumpulan 4", "Kumpulan 5"];
+
+        // Helper untuk Storan Selamat (Mengelakkan ralat sekatan di Google Sites)
+        const safeStorage = {
+            memory: {},
+            set: function(key, value) {
+                this.memory[key] = value;
+                try { localStorage.setItem(key, value); } catch(e) {}
+            },
+            get: function(key) {
+                try { return localStorage.getItem(key) || this.memory[key]; } 
+                catch(e) { return this.memory[key] || null; }
+            },
+            getAll: function() {
+                let data = [];
+                // Cuba ambil dari localStorage
+                try {
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('kmr_score_')) {
+                            try { data.push(JSON.parse(localStorage.getItem(key))); } catch(e){}
+                        }
+                    }
+                } catch(e) {
+                    // Fallback in-memory jika localStorage disekat Google Sites
+                    for (const key in this.memory) {
+                        if (key.startsWith('kmr_score_')) {
+                            try { data.push(JSON.parse(this.memory[key])); } catch(e){}
+                        }
+                    }
+                }
+                return data;
+            }
+        };
+
+        class KMRApp {
+            constructor() {
+                this.db = null;
+                this.auth = null;
+                this.user = null;
+                this.unsubscribeDashboard = null;
+                this.isLocalMode = false;
+                
+                // State
+                this.currentView = 'home';
+                this.selectedJudge = null;
+                this.selectedGroup = null;
+                this.currentScores = {}; 
+                this.allScoresData = []; 
+
+                this.initFirebase();
+            }
+
+            async initFirebase() {
+                if (!FIREBASE_CONFIG) {
+                    console.warn("Beroperasi dalam mod Google Sites (Luar Talian/Standalone).");
+                    this.isLocalMode = true;
+                    this.user = { uid: 'local' };
+                    
+                    // Setup BroadcastChannel untuk sync jika dibuka dalam tab browser yang sama (Ujian)
+                    try {
+                        this.channel = new BroadcastChannel('kmr_sync');
+                        this.channel.onmessage = (e) => {
+                            if (e.data === 'update' && this.currentView === 'dashboard') {
+                                this.listenToDashboard();
+                            }
+                        };
+                    } catch(e) {}
+
+                    this.hideLoader();
+                    this.renderJudgeOptions();
+                    this.generateScoringForm();
+                    if(this.currentView === 'dashboard') this.listenToDashboard();
+                    this.showToast("Sedia digunakan.", "success");
+                    return;
+                }
+
+                try {
+                    const app = initializeApp(FIREBASE_CONFIG);
+                    this.auth = getAuth(app);
+                    this.db = getFirestore(app);
+
+                    // Authentication dengan perlindungan ralat (error handling)
+                    try {
+                        if (INITIAL_TOKEN) {
+                            await signInWithCustomToken(this.auth, INITIAL_TOKEN);
+                        } else {
+                            await signInAnonymously(this.auth);
+                        }
+                    } catch(authError) {
+                        console.warn("Ralat token auth, mencuba log masuk tanpa nama...", authError);
+                        await signInAnonymously(this.auth);
+                    }
+
+                    this.auth.onAuthStateChanged((user) => {
+                        if (user) {
+                            this.user = user;
+                            this.hideLoader();
+                            this.renderJudgeOptions();
+                            this.generateScoringForm();
+                            // Jika berada di dashboard sebelum auth siap
+                            if(this.currentView === 'dashboard') this.listenToDashboard();
+                        } else {
+                            this.user = null;
+                            this.showError("Gagal menyambung ke pangkalan data awan.");
+                        }
+                    });
+
+                } catch (error) {
+                    console.error("Firebase init error:", error);
+                    this.showError("Ralat pangkalan data: " + error.message);
+                }
+            }
+
+            // --- Navigasi & UI Umum ---
+            navigate(viewId) {
+                // Sembunyi semua
+                ['home', 'judge-setup', 'scoring', 'dashboard'].forEach(v => {
+                    document.getElementById(`view-${v}`).classList.add('hidden');
+                });
+                
+                // Tunjuk yg baru
+                document.getElementById(`view-${viewId}`).classList.remove('hidden');
+                this.currentView = viewId;
+
+                // Logik spesifik view
+                if (viewId === 'dashboard') {
+                    this.listenToDashboard();
+                } else if (this.unsubscribeDashboard) {
+                    this.unsubscribeDashboard();
+                    this.unsubscribeDashboard = null;
+                }
+            }
+
+            hideLoader() {
+                const loader = document.getElementById('app-loader');
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.style.display = 'none', 300);
+            }
+
+            showLoader(text = "Memuatkan...") {
+                const loader = document.getElementById('app-loader');
+                document.getElementById('loader-text').innerText = text;
+                loader.style.display = 'flex';
+                // Trigger reflow
+                void loader.offsetWidth;
+                loader.classList.remove('opacity-0');
+            }
+
+            showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                const isError = type === 'error';
+                
+                toast.className = `toast-enter flex items-center gap-3 p-4 rounded-xl shadow-lg pointer-events-auto text-white text-sm font-medium ${isError ? 'bg-red-600' : 'bg-emerald-600'}`;
+                toast.innerHTML = `
+                    <i class="ph-fill ${isError ? 'ph-warning-circle' : 'ph-check-circle'} text-xl"></i>
+                    <span>${message}</span>
+                `;
+                
+                container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.classList.replace('toast-enter', 'toast-exit');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            showError(msg) {
+                this.showToast(msg, 'error');
+                this.hideLoader();
+            }
+
+            // --- Logik Hakim (Borang) ---
+            showJudgeSelection() {
+                this.selectedJudge = null;
+                this.selectedGroup = null;
+                document.getElementById('group-select').value = "";
+                document.getElementById('group-selection-wrapper').classList.add('hidden', 'opacity-0');
+                document.getElementById('btn-start-scoring').disabled = true;
+                
+                // Reset styling butang hakim
+                document.querySelectorAll('.judge-btn').forEach(btn => {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600', 'ring-4', 'ring-indigo-100');
+                    btn.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+                });
+
+                this.navigate('judge-setup');
+            }
+
+            renderJudgeOptions() {
+                const container = document.getElementById('judge-selection-container');
+                container.innerHTML = '';
+                
+                JUDGES.forEach(judge => {
+                    const btn = document.createElement('button');
+                    btn.className = `judge-btn w-full p-4 text-left border rounded-xl font-bold transition-all bg-white text-slate-700 border-slate-300 hover:border-indigo-400 flex justify-between items-center`;
+                    btn.innerHTML = `<span>${judge}</span> <i class="ph-fill ph-check-circle opacity-0 transition-opacity"></i>`;
+                    
+                    btn.onclick = () => {
+                        this.selectedJudge = judge;
+                        // Kemas kini UI
+                        document.querySelectorAll('.judge-btn').forEach(b => {
+                            b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600', 'ring-4', 'ring-indigo-100');
+                            b.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+                            b.querySelector('i').classList.add('opacity-0');
+                        });
+                        btn.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+                        btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600', 'ring-4', 'ring-indigo-100');
+                        btn.querySelector('i').classList.remove('opacity-0');
+
+                        // Tunjuk pilihan kumpulan
+                        const groupWrapper = document.getElementById('group-selection-wrapper');
+                        groupWrapper.classList.remove('hidden');
+                        setTimeout(() => groupWrapper.classList.remove('opacity-0'), 50);
+                        
+                        this.checkGroupSelection();
+                    };
+                    container.appendChild(btn);
+                });
+            }
+
+            checkGroupSelection() {
+                const groupSelect = document.getElementById('group-select');
+                this.selectedGroup = groupSelect.value;
+                const btnStart = document.getElementById('btn-start-scoring');
+                
+                if (this.selectedJudge && this.selectedGroup) {
+                    btnStart.disabled = false;
+                } else {
+                    btnStart.disabled = true;
+                }
+            }
+
+            generateScoringForm() {
+                const container = document.getElementById('rubric-form-container');
+                container.innerHTML = '';
+
+                RUBRIC_DATA.forEach((section, index) => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = `mb-8 bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm`;
+                    
+                    let html = `
+                        <div class="bg-indigo-50 px-4 py-3 border-b border-indigo-100">
+                            <h3 class="font-bold text-indigo-900 text-sm tracking-wide">${section.section}</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                    `;
+
+                    section.items.forEach(item => {
+                        html += `
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pb-4 border-b border-slate-100 last:border-0 last:pb-0">
+                                <label class="text-sm text-slate-700 sm:w-2/3 leading-snug pr-2" for="${item.id}">
+                                    ${item.label}
+                                </label>
+                                <div class="flex items-center gap-3 sm:w-1/3 justify-start sm:justify-end">
+                                    <div class="flex items-center bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-slate-500 hover:bg-slate-200 active:bg-slate-300 transition-colors" onclick="app.adjustScore('${item.id}', -1, ${item.max})">
+                                            <i class="ph ph-minus"></i>
+                                        </button>
+                                        <input type="number" 
+                                            id="${item.id}" 
+                                            min="0" max="${item.max}" 
+                                            value="0"
+                                            class="w-12 h-10 text-center font-bold text-slate-800 bg-transparent outline-none rubric-input"
+                                            onchange="app.validateInput(this, ${item.max})"
+                                            oninput="app.calculateTotal()"
+                                        >
+                                        <button type="button" class="w-10 h-10 flex items-center justify-center text-slate-500 hover:bg-slate-200 active:bg-slate-300 transition-colors" onclick="app.adjustScore('${item.id}', 1, ${item.max})">
+                                            <i class="ph ph-plus"></i>
+                                        </button>
+                                    </div>
+                                    <span class="text-xs font-semibold text-slate-400 w-10 text-right">/ ${item.max}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                    sectionDiv.innerHTML = html;
+                    container.appendChild(sectionDiv);
+                });
+            }
+
+            adjustScore(inputId, change, max) {
+                const input = document.getElementById(inputId);
+                let val = parseInt(input.value) || 0;
+                val += change;
+                
+                if (val < 0) val = 0;
+                if (val > max) val = max;
+                
+                input.value = val;
+                this.calculateTotal();
+            }
+
+            validateInput(input, max) {
+                let val = parseInt(input.value);
+                if (isNaN(val) || val < 0) val = 0;
+                if (val > max) val = max;
+                input.value = val;
+                this.calculateTotal();
+            }
+
+            calculateTotal() {
+                let total = 0;
+                const inputs = document.querySelectorAll('.rubric-input');
+                inputs.forEach(input => {
+                    total += (parseInt(input.value) || 0);
+                });
+                document.getElementById('live-total-score').innerHTML = `${total}<span class="text-sm text-slate-400 font-normal">/100</span>`;
+                return total;
+            }
+
+            async startScoring() {
+                if (!this.selectedJudge || !this.selectedGroup) return;
+                
+                if (!this.user) {
+                    this.showError("Sistem belum sedia.");
+                    return;
+                }
+
+                this.showLoader("Memuatkan borang...");
+                document.getElementById('scoring-judge-name').innerText = this.selectedJudge;
+                document.getElementById('scoring-group-name').innerText = this.selectedGroup;
+
+                // Reset borang ke kosong dahulu
+                document.querySelectorAll('.rubric-input').forEach(input => input.value = "0");
+                this.calculateTotal();
+
+                const docId = `${this.selectedJudge.replace(/\s+/g, '')}_${this.selectedGroup.replace(/\s+/g, '')}`;
+
+                if (this.isLocalMode) {
+                    const saved = safeStorage.get(`kmr_score_${docId}`);
+                    if (saved) {
+                        try {
+                            const data = JSON.parse(saved);
+                            if (data.scores) {
+                                for (const [id, val] of Object.entries(data.scores)) {
+                                    const el = document.getElementById(id);
+                                    if (el) el.value = val;
+                                }
+                            }
+                            this.showToast(`Markah terdahulu dimuat turun.`, 'success');
+                        } catch(e) {}
+                    }
+                    this.calculateTotal();
+                    this.hideLoader();
+                    this.navigate('scoring');
+                    return;
+                }
+
+                try {
+                    // Cek jika hakim sudah pernah nilai kumpulan ni dari cloud
+                    const docRef = doc(this.db, 'artifacts', APP_ID, 'public', 'data', 'scores', docId);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.scores) {
+                            for (const [id, val] of Object.entries(data.scores)) {
+                                const el = document.getElementById(id);
+                                if (el) el.value = val;
+                            }
+                        }
+                        this.showToast(`Markah terdahulu untuk ${this.selectedGroup} dimuat turun.`, 'success');
+                    }
+                    
+                    this.calculateTotal();
+                    this.hideLoader();
+                    this.navigate('scoring');
+
+                } catch (error) {
+                    console.error("Error fetching existing score:", error);
+                    this.showError("Gagal menyemak data lama pelayan. Anda boleh mula menilai.");
+                    this.hideLoader();
+                    this.navigate('scoring');
+                }
+            }
+
+            async submitScore() {
+                if (!this.user) {
+                    this.showError("Ralat: Sila muat semula halaman.");
+                    return;
+                }
+
+                const total = this.calculateTotal();
+                const scores = {};
+                document.querySelectorAll('.rubric-input').forEach(input => {
+                    scores[input.id] = parseInt(input.value) || 0;
+                });
+
+                this.showLoader("Menyimpan markah...");
+                const docId = `${this.selectedJudge.replace(/\s+/g, '')}_${this.selectedGroup.replace(/\s+/g, '')}`;
+
+                if (this.isLocalMode) {
+                    const scoreData = {
+                        judgeName: this.selectedJudge,
+                        groupName: this.selectedGroup,
+                        scores: scores,
+                        totalScore: total,
+                        updatedAt: new Date().toISOString()
+                    };
+                    safeStorage.set(`kmr_score_${docId}`, JSON.stringify(scoreData));
+                    if (this.channel) this.channel.postMessage('update');
+                    
+                    this.hideLoader();
+                    this.showToast("Markah berjaya disimpan!");
+                    setTimeout(() => this.showJudgeSelection(), 1500);
+                    return;
+                }
+
+                try {
+                    const docRef = doc(this.db, 'artifacts', APP_ID, 'public', 'data', 'scores', docId);
+                    
+                    await setDoc(docRef, {
+                        judgeName: this.selectedJudge,
+                        groupName: this.selectedGroup,
+                        scores: scores,
+                        totalScore: total,
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    this.hideLoader();
+                    this.showToast("Markah berjaya disimpan di Cloud!");
+                    setTimeout(() => {
+                        this.showJudgeSelection();
+                    }, 1500);
+
+                } catch (error) {
+                    console.error("Error saving score:", error);
+                    this.showError("Penyimpanan gagal. Semak internet anda.");
+                    this.hideLoader();
+                }
+            }
+
+            // --- Logik Pusat Sehenti (Dashboard) ---
+            listenToDashboard() {
+                if (!this.user) {
+                    this.showError("Sistem gagal memuatkan paparan.");
+                    return;
+                }
+                
+                if (this.isLocalMode) {
+                    this.showLoader("Memuatkan data...");
+                    this.allScoresData = safeStorage.getAll();
+                    this.renderDashboard();
+                    this.hideLoader();
+                    return;
+                }
+
+                this.showLoader("Menyambung kepada siaran lansung pelayan...");
+                
+                const scoresRef = collection(this.db, 'artifacts', APP_ID, 'public', 'data', 'scores');
+                
+                // Mendengar perubahan pada Firestore (Live Real-time Update)
+                this.unsubscribeDashboard = onSnapshot(scoresRef, (snapshot) => {
+                    this.allScoresData = [];
+                    snapshot.forEach(doc => {
+                        this.allScoresData.push(doc.data());
+                    });
+                    
+                    this.renderDashboard();
+                    this.hideLoader();
+                }, (error) => {
+                    console.error("Dashboard listen error:", error);
+                    this.showError("Terputus sambungan ke siaran langsung pelayan.");
+                    this.hideLoader();
+                });
+            }
+
+            renderDashboard() {
+                const tbody = document.getElementById('dashboard-tbody');
+                
+                // Proses data: Kelompokkan mengikut kumpulan
+                const groupResults = {};
+                GROUPS.forEach(g => {
+                    groupResults[g] = {
+                        name: g,
+                        judgeScores: {}, // e.g., {'Hakim 1': 80, 'Hakim 2': null}
+                        totalSubmitted: 0,
+                        sumScores: 0,
+                        average: 0
+                    };
+                    JUDGES.forEach(j => groupResults[g].judgeScores[j] = null);
+                });
+
+                // Isi data yang diterima dari Firebase
+                this.allScoresData.forEach(entry => {
+                    const group = groupResults[entry.groupName];
+                    if (group) {
+                        group.judgeScores[entry.judgeName] = entry.totalScore;
+                        group.totalSubmitted++;
+                        group.sumScores += entry.totalScore;
+                    }
+                });
+
+                // Kira purata dan tukar ke array untuk sorting
+                const resultsArray = Object.values(groupResults).map(g => {
+                    g.average = g.totalSubmitted > 0 ? (g.sumScores / g.totalSubmitted).toFixed(2) : 0;
+                    return g;
+                });
+
+                // Sort: Paling tinggi di atas
+                resultsArray.sort((a, b) => parseFloat(b.average) - parseFloat(a.average));
+
+                // Render HTML
+                tbody.innerHTML = '';
+                
+                if (resultsArray.length === 0) {
+                     tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500">Tiada kumpulan dijumpai.</td></tr>`;
+                     return;
+                }
+
+                resultsArray.forEach((result, index) => {
+                    // Warna badge kedudukan
+                    let rankBadge = `<span class="inline-block w-6 h-6 rounded-full bg-slate-200 text-slate-600 font-bold text-xs leading-6 text-center">${index + 1}</span>`;
+                    if (index === 0 && result.totalSubmitted > 0) rankBadge = `<span class="inline-block w-8 h-8 rounded-full bg-yellow-400 text-yellow-900 shadow-md font-black text-sm leading-8 text-center border-2 border-yellow-200"><i class="ph-fill ph-trophy"></i></span>`;
+                    if (index === 1 && result.totalSubmitted > 0) rankBadge = `<span class="inline-block w-7 h-7 rounded-full bg-slate-300 text-slate-800 shadow-sm font-bold text-xs leading-7 text-center">${index + 1}</span>`;
+                    if (index === 2 && result.totalSubmitted > 0) rankBadge = `<span class="inline-block w-7 h-7 rounded-full bg-amber-600 text-amber-50 shadow-sm font-bold text-xs leading-7 text-center">${index + 1}</span>`;
+
+                    let html = `
+                        <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors ${index === 0 && result.totalSubmitted > 0 ? 'bg-yellow-50/30' : ''}">
+                            <td class="p-4 text-center align-middle">${rankBadge}</td>
+                            <td class="p-4 align-middle">
+                                <div class="font-bold text-slate-800 text-base">${result.name}</div>
+                                <div class="text-xs text-slate-400 mt-1">${result.totalSubmitted}/3 Hakim selesai</div>
+                            </td>
+                    `;
+
+                    // Lajur Markah setiap hakim
+                    JUDGES.forEach(j => {
+                        const score = result.judgeScores[j];
+                        if (score !== null) {
+                            html += `<td class="p-4 text-center align-middle font-semibold text-slate-700">${score}</td>`;
+                        } else {
+                            html += `<td class="p-4 text-center align-middle text-slate-300 italic text-xs">-</td>`;
+                        }
+                    });
+
+                    // Purata
+                    const hasScores = result.totalSubmitted > 0;
+                    html += `
+                            <td class="p-4 text-center align-middle bg-indigo-50/30">
+                                <span class="text-xl font-black ${hasScores ? 'text-indigo-700' : 'text-slate-300'}">
+                                    ${hasScores ? result.average : '-'}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += html;
+                });
+            }
+        }
+
+        // Initialize App on window load
+        window.onload = () => {
+            window.app = new KMRApp();
+        };
+
+    </script>
+</body>
+</html>
