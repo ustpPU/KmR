@@ -6,7 +6,7 @@
     <title>Laporan Pemarkahan Showcase SMK Seksyen 4 Kota Damansara</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- SweetAlert2 (Untuk Popup Loading & Success yang cantik) -->
+    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-50 font-sans min-h-screen pb-12">
@@ -40,7 +40,7 @@
                         <input type="text" id="nama-penilai" placeholder="Nama hakim" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Kumpulan</label>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Kumpulan *</label>
                         <input type="text" id="nama-kumpulan" placeholder="Contoh: Kumpulan 1" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
                     </div>
                     <div>
@@ -48,78 +48,155 @@
                         <input type="number" id="bil-ahli" placeholder="0" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tajuk Projek</label>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tajuk Projek *</label>
                         <input type="text" id="tajuk-projek" placeholder="Tajuk projek KmR" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
                     </div>
                 </div>
             </div>
 
             <form id="borang-markah" class="space-y-6">
-                <!-- SUBJEK (10%) -->
+                <!-- 1. SUBJEK (10%) -->
                 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div class="bg-emerald-50 px-6 py-3 border-b border-emerald-100 flex justify-between items-center">
                         <h3 class="font-bold text-emerald-900 text-sm">1. SUBJEK</h3>
-                        <span class="text-xs bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-full">10%</span>
+                        <span class="text-xs bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-full">Jumlah: 10%</span>
                     </div>
                     <div class="p-4 divide-y divide-gray-100">
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Gabungan Mata pelajaran</span><input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">The big idea</span><input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Aktiviti pembelajaran KMR</span><input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Berkongsi & demonstrasi konsep</span><input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Menerangkan kepentingan konsep</span><input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Gabungan Mata pelajaran <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">The big idea <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Aktiviti pembelajaran KMR <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Berkongsi & demonstrasi konsep jelas <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Menerangkan kepentingan konsep <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
+                        </div>
                     </div>
                 </div>
 
-                <!-- PENYAMPAIAN (20%) -->
+                <!-- 2. PENYAMPAIAN (20%) -->
                 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div class="bg-blue-50 px-6 py-3 border-b border-blue-100 flex justify-between items-center">
                         <h3 class="font-bold text-blue-900 text-sm">2. PENYAMPAIAN</h3>
-                        <span class="text-xs bg-blue-200 text-blue-800 font-bold px-2.5 py-1 rounded-full">20%</span>
+                        <span class="text-xs bg-blue-200 text-blue-800 font-bold px-2.5 py-1 rounded-full">Jumlah: 20%</span>
                     </div>
                     <div class="p-4 divide-y divide-gray-100">
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Kelancaran komunikasi</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Pembentangan berkeyakinan</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Menarik</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Berinformasi</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Kelancaran komunikasi <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Pembentangan berkeyakinan <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Menarik <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Berinformasi <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
                     </div>
                 </div>
 
-                <!-- PRODUK KMR (35%) -->
+                <!-- 3. PRODUK KMR (35%) -->
                 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div class="bg-amber-50 px-6 py-3 border-b border-amber-100 flex justify-between items-center">
                         <h3 class="font-bold text-amber-900 text-sm">3. PRODUK KMR</h3>
-                        <span class="text-xs bg-amber-200 text-amber-800 font-bold px-2.5 py-1 rounded-full">35%</span>
+                        <span class="text-xs bg-amber-200 text-amber-800 font-bold px-2.5 py-1 rounded-full">Jumlah: 35%</span>
                     </div>
                     <div class="p-4 divide-y divide-gray-100">
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Inovasi bumi hijau / go green</span><input type="number" min="0" max="10" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Kreatif dan menarik</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Berfungsi dengan baik</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Mesra pengguna</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Praktikal</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
-                        <div class="py-2 flex justify-between items-center"><span class="text-sm">Produk menepati konsep</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-16 p-2 text-center border rounded-lg text-sm" placeholder="0"></div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Inovasi bumi hijau / go green <span class="text-xs font-bold text-amber-700">(Max 10)</span></span>
+                            <input type="number" min="0" max="10" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 10">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Kreatif dan menarik <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Berfungsi dengan baik <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Mesra pengguna <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Praktikal <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
+                        <div class="py-2.5 flex justify-between items-center gap-2">
+                            <span class="text-sm">Produk menepati konsep <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
+                        </div>
                     </div>
                 </div>
 
-                <!-- LAIN-LAIN -->
+                <!-- 4, 5, 6. KATEGORI LAIN -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-white rounded-2xl border p-4 space-y-2">
-                        <h4 class="font-bold text-xs uppercase text-purple-900">4. POTENSI (15%)</h4>
-                        <div class="flex justify-between text-xs"><span>Berfokus</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="potensi" class="skor-input w-12 p-1 text-center border rounded" placeholder="0"></div>
-                        <div class="flex justify-between text-xs"><span>Penyebarluasan</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="potensi" class="skor-input w-12 p-1 text-center border rounded" placeholder="0"></div>
-                        <div class="flex justify-between text-xs"><span>Masa Depan</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="potensi" class="skor-input w-12 p-1 text-center border rounded" placeholder="0"></div>
+                    <!-- 4. POTENSI -->
+                    <div class="bg-white rounded-2xl border p-4 space-y-3">
+                        <div class="flex justify-between items-center border-b pb-1">
+                            <h4 class="font-bold text-xs uppercase text-purple-900">4. POTENSI</h4>
+                            <span class="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded">15%</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Berfokus <b class="text-purple-700">(Max 5)</b></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="potensi" class="skor-input w-14 p-1.5 text-center border rounded font-semibold" placeholder="0-5">
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Penyebarluasan <b class="text-purple-700">(Max 5)</b></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="potensi" class="skor-input w-14 p-1.5 text-center border rounded font-semibold" placeholder="0-5">
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Masa Depan <b class="text-purple-700">(Max 5)</b></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="potensi" class="skor-input w-14 p-1.5 text-center border rounded font-semibold" placeholder="0-5">
+                        </div>
                     </div>
-                    <div class="bg-white rounded-2xl border p-4 space-y-2">
-                        <h4 class="font-bold text-xs uppercase text-rose-900">5. BERIMPAK (10%)</h4>
-                        <div class="flex justify-between text-xs"><span>Selesai Masalah</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="berimpak" class="skor-input w-12 p-1 text-center border rounded" placeholder="0"></div>
-                        <div class="flex justify-between text-xs"><span>Pelbagai Guna</span><input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="berimpak" class="skor-input w-12 p-1 text-center border rounded" placeholder="0"></div>
+
+                    <!-- 5. BERIMPAK -->
+                    <div class="bg-white rounded-2xl border p-4 space-y-3">
+                        <div class="flex justify-between items-center border-b pb-1">
+                            <h4 class="font-bold text-xs uppercase text-rose-900">5. BERIMPAK</h4>
+                            <span class="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">10%</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Selesai Masalah <b class="text-rose-700">(Max 5)</b></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="berimpak" class="skor-input w-14 p-1.5 text-center border rounded font-semibold" placeholder="0-5">
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Pelbagai Guna <b class="text-rose-700">(Max 5)</b></span>
+                            <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="berimpak" class="skor-input w-14 p-1.5 text-center border rounded font-semibold" placeholder="0-5">
+                        </div>
                     </div>
-                    <div class="bg-white rounded-2xl border p-4 flex flex-col justify-between">
-                        <h4 class="font-bold text-xs uppercase text-cyan-900">6. WOW FAKTOR (10%)</h4>
-                        <div class="flex justify-between text-xs items-center"><span>Keunikan</span><input type="number" min="0" max="10" oninput="kiraJumlah()" data-cat="wow" class="skor-input w-14 p-1 text-center border rounded" placeholder="0"></div>
+
+                    <!-- 6. WOW FAKTOR -->
+                    <div class="bg-white rounded-2xl border p-4 flex flex-col justify-between space-y-3">
+                        <div class="flex justify-between items-center border-b pb-1">
+                            <h4 class="font-bold text-xs uppercase text-cyan-900">6. WOW FAKTOR</h4>
+                            <span class="text-[10px] bg-cyan-100 text-cyan-800 font-bold px-2 py-0.5 rounded">10%</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span>Keunikan <b class="text-cyan-700">(Max 10)</b></span>
+                            <input type="number" min="0" max="10" oninput="kiraJumlah()" data-cat="wow" class="skor-input w-16 p-1.5 text-center border rounded font-semibold" placeholder="0-10">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Action Button -->
+                <!-- Action Bar -->
                 <div class="bg-gray-900 text-white p-4 rounded-xl flex justify-between items-center shadow-md">
                     <div>
                         <span class="text-xs text-gray-400 font-bold block">JUMLAH MARKAH</span>
@@ -171,8 +248,8 @@
     </main>
 
     <script>
-        // MASUKKAN GOOGLE APPS SCRIPT WEB APP URL ANDA DI SINI!
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/moe-dl.edu.my/s/AKfycbyfWyd6m5_ZsHS3liVZYWuHnGCDsn2EtjrxsihFdfvjvYL2KIpqhrEncvm0Rqd18gs/exec";
+        // ⚠️ TUKAR URL INI DENGAN URL WEB APP GOOGLE SCRIPT ANDA!
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa2FIINHnydtJiXweG42n4nrbW4Dz9fEWXCrgBV_xKun6nSVyZnmFzb_wJ7dfQuD84/exec";
 
         function tukarTab(tab) {
             const tabPengisian = document.getElementById('tab-pengisian');
@@ -216,7 +293,6 @@
             const bilAhli = document.getElementById('bil-ahli').value || 0;
             const tajukProjek = document.getElementById('tajuk-projek').value.trim();
 
-            // Pengesahan Input Menggunakan SweetAlert Warning
             if (!namaKumpulan || !tajukProjek) {
                 Swal.fire({
                     icon: 'warning',
@@ -227,7 +303,6 @@
                 return;
             }
 
-            // Kumpul pecahan markah
             let cats = { subjek: 0, penyampaian: 0, produk: 0, potensi: 0, berimpak: 0, wow: 0 };
             document.querySelectorAll('.skor-input').forEach(i => {
                 let c = i.getAttribute('data-cat');
@@ -248,7 +323,6 @@
                 jumlah: kiraJumlah()
             };
 
-            // 1. TAMPILKAN SWEETALERT LOADING SPINNER
             Swal.fire({
                 title: 'Menghantar Markah...',
                 text: 'Sila tunggu sebentar, data sedang dihantar ke Cloud Google Sheets.',
@@ -259,7 +333,6 @@
                 }
             });
 
-            // Penghantaran data menerusi API
             fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -267,7 +340,6 @@
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                // 2. TAMPILKAN SWEETALERT SUCCESS HANDLER
                 Swal.fire({
                     icon: 'success',
                     title: 'Pemarkahan Berjaya Dihantar!',
@@ -275,19 +347,15 @@
                     confirmButtonText: 'Lihat Keputusan Terkini',
                     confirmButtonColor: '#16a34a'
                 }).then(() => {
-                    // Reset borang pengisian markah
                     document.getElementById('borang-markah').reset();
                     document.getElementById('nama-kumpulan').value = '';
                     document.getElementById('bil-ahli').value = '';
                     document.getElementById('tajuk-projek').value = '';
                     kiraJumlah();
-                    
-                    // Alih paparan ke tab Jumlah Markah Terkini
                     tukarTab('jumlah');
                 });
             })
             .catch(err => {
-                // 3. TAMPILKAN SWEETALERT ERROR HANDLER
                 Swal.fire({
                     icon: 'error',
                     title: 'Penghantaran Gagal!',
@@ -308,7 +376,13 @@
             .then(data => {
                 loading.style.display = 'none';
                 
-                // Susun mengikut markah tertinggi
+                if(!data || data.length === 0) {
+                    loading.innerText = "Belum ada rekod pemarkahan dimasukkan dalam Google Sheets.";
+                    loading.style.display = 'block';
+                    return;
+                }
+
+                // Susun ikut markah tertinggi
                 data.sort((a, b) => b.jumlah - a.jumlah);
 
                 data.forEach((item, index) => {
@@ -331,8 +405,8 @@
                     tbody.appendChild(tr);
                 });
             })
-            .catch(() => {
-                loading.innerText = "Gagal memuat turun data. Sila pastikan URL Web App Google Script telah diletakkan dengan betul.";
+            .catch(err => {
+                loading.innerText = "Gagal memuat turun data. Sila pastikan tetapan 'Who has access' di Google Apps Script telah set kepada 'Anyone'.";
             });
         }
     </script>
