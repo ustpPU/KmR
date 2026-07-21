@@ -26,7 +26,7 @@
                 📝 Pengisian Markah
             </button>
             <button id="btn-jumlah" onclick="tukarTab('jumlah')" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-bold transition-all shadow bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300 cursor-pointer">
-                📊 Jumlah Markah Terkini
+                📊 Keputusan Markah (/300)
             </button>
         </div>
 
@@ -35,21 +35,40 @@
             <div class="bg-white p-6 rounded-2xl shadow-xs border border-gray-100">
                 <h2 class="text-md font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">Maklumat Kumpulan & Penilai</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dropdown Penilai -->
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Penilai / Hakim</label>
-                        <input type="text" id="nama-penilai" placeholder="Nama hakim" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Penilai / Hakim *</label>
+                        <select id="nama-penilai" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none font-semibold">
+                            <option value="">-- Pilih Nama Hakim --</option>
+                            <option value="Sathiah a/p Shammugam">Sathiah a/p Shammugam</option>
+                            <option value="Maria Farinna binti Zainal Abidin">Maria Farinna binti Zainal Abidin</option>
+                            <option value="Thanabalan a/l Munuswamy">Thanabalan a/l Munuswamy</option>
+                        </select>
                     </div>
+
+                    <!-- Dropdown Kumpulan -->
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Kumpulan *</label>
-                        <input type="text" id="nama-kumpulan" placeholder="Contoh: Kumpulan 1" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
+                        <select id="nama-kumpulan" onchange="pilihKumpulanAuto()" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none font-semibold">
+                            <option value="">-- Pilih Kumpulan --</option>
+                            <option value="Kumpulan 1">Kumpulan 1</option>
+                            <option value="Kumpulan 2">Kumpulan 2</option>
+                            <option value="Kumpulan 3">Kumpulan 3</option>
+                            <option value="Kumpulan 4">Kumpulan 4</option>
+                            <option value="Kumpulan 5">Kumpulan 5</option>
+                        </select>
                     </div>
+
+                    <!-- Tajuk Projek Auto-Fill -->
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tajuk Projek</label>
+                        <input type="text" id="tajuk-projek" readonly placeholder="Tajuk projek dipapar automatik" class="w-full p-2.5 border border-gray-200 rounded-lg text-sm bg-gray-100 text-gray-700 font-medium focus:outline-none">
+                    </div>
+
+                    <!-- Bilangan Ahli -->
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Bilangan Ahli</label>
                         <input type="number" id="bil-ahli" placeholder="0" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tajuk Projek *</label>
-                        <input type="text" id="tajuk-projek" placeholder="Tajuk projek KmR" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-gray-50 focus:bg-white focus:outline-none">
                     </div>
                 </div>
             </div>
@@ -63,23 +82,23 @@
                     </div>
                     <div class="p-4 divide-y divide-gray-100">
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Gabungan Mata pelajaran <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <span class="text-sm">Gabungan Mata pelajaran <b class="text-emerald-700 text-xs">(Max 2)</b></span>
                             <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">The big idea <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <span class="text-sm">The big idea <b class="text-emerald-700 text-xs">(Max 2)</b></span>
                             <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Aktiviti pembelajaran KMR <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <span class="text-sm">Aktiviti pembelajaran KMR <b class="text-emerald-700 text-xs">(Max 2)</b></span>
                             <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Berkongsi & demonstrasi konsep jelas <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <span class="text-sm">Berkongsi & demonstrasi konsep jelas <b class="text-emerald-700 text-xs">(Max 2)</b></span>
                             <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Menerangkan kepentingan konsep <span class="text-xs font-bold text-emerald-700">(Max 2)</span></span>
+                            <span class="text-sm">Menerangkan kepentingan konsep <b class="text-emerald-700 text-xs">(Max 2)</b></span>
                             <input type="number" min="0" max="2" oninput="kiraJumlah()" data-cat="subjek" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 2">
                         </div>
                     </div>
@@ -93,19 +112,19 @@
                     </div>
                     <div class="p-4 divide-y divide-gray-100">
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Kelancaran komunikasi <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <span class="text-sm">Kelancaran komunikasi <b class="text-blue-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Pembentangan berkeyakinan <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <span class="text-sm">Pembentangan berkeyakinan <b class="text-blue-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Menarik <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <span class="text-sm">Menarik <b class="text-blue-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Berinformasi <span class="text-xs font-bold text-blue-700">(Max 5)</span></span>
+                            <span class="text-sm">Berinformasi <b class="text-blue-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="penyampaian" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                     </div>
@@ -119,35 +138,34 @@
                     </div>
                     <div class="p-4 divide-y divide-gray-100">
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Inovasi bumi hijau / go green <span class="text-xs font-bold text-amber-700">(Max 10)</span></span>
+                            <span class="text-sm">Inovasi bumi hijau / go green <b class="text-amber-700 text-xs">(Max 10)</b></span>
                             <input type="number" min="0" max="10" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 10">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Kreatif dan menarik <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <span class="text-sm">Kreatif dan menarik <b class="text-amber-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Berfungsi dengan baik <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <span class="text-sm">Berfungsi dengan baik <b class="text-amber-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Mesra pengguna <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <span class="text-sm">Mesra pengguna <b class="text-amber-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Praktikal <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <span class="text-sm">Praktikal <b class="text-amber-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                         <div class="py-2.5 flex justify-between items-center gap-2">
-                            <span class="text-sm">Produk menepati konsep <span class="text-xs font-bold text-amber-700">(Max 5)</span></span>
+                            <span class="text-sm">Produk menepati konsep <b class="text-amber-700 text-xs">(Max 5)</b></span>
                             <input type="number" min="0" max="5" oninput="kiraJumlah()" data-cat="produk" class="skor-input w-20 p-2 text-center border rounded-lg text-sm font-semibold" placeholder="0 - 5">
                         </div>
                     </div>
                 </div>
 
-                <!-- 4, 5, 6. KATEGORI LAIN -->
+                <!-- LAIN-LAIN -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- 4. POTENSI -->
                     <div class="bg-white rounded-2xl border p-4 space-y-3">
                         <div class="flex justify-between items-center border-b pb-1">
                             <h4 class="font-bold text-xs uppercase text-purple-900">4. POTENSI</h4>
@@ -167,7 +185,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. BERIMPAK -->
                     <div class="bg-white rounded-2xl border p-4 space-y-3">
                         <div class="flex justify-between items-center border-b pb-1">
                             <h4 class="font-bold text-xs uppercase text-rose-900">5. BERIMPAK</h4>
@@ -183,7 +200,6 @@
                         </div>
                     </div>
 
-                    <!-- 6. WOW FAKTOR -->
                     <div class="bg-white rounded-2xl border p-4 flex flex-col justify-between space-y-3">
                         <div class="flex justify-between items-center border-b pb-1">
                             <h4 class="font-bold text-xs uppercase text-cyan-900">6. WOW FAKTOR</h4>
@@ -199,26 +215,26 @@
                 <!-- Action Bar -->
                 <div class="bg-gray-900 text-white p-4 rounded-xl flex justify-between items-center shadow-md">
                     <div>
-                        <span class="text-xs text-gray-400 font-bold block">JUMLAH MARKAH</span>
+                        <span class="text-xs text-gray-400 font-bold block">JUMLAH MARKAH HAKIM</span>
                         <span id="live-total" class="text-3xl font-black text-amber-400">0 <span class="text-sm font-normal text-white">/ 100</span></span>
                     </div>
                     <button type="button" id="btn-simpan" onclick="hantarKeGoogleSheet()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer flex items-center gap-2 shadow-lg">
-                        ☁️ Hantar Markah Ke Cloud
+                        ☁️ Hantar Markah
                     </button>
                 </div>
             </form>
         </section>
 
-        <!-- TAB 2: JUMLAH MARKAH TERKINI -->
+        <!-- TAB 2: PURATA / JUMLAH MARKAH TERKUMPUL -->
         <section id="tab-jumlah" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                 <div class="flex justify-between items-center border-b pb-4 mb-4">
                     <div>
-                        <h2 class="text-lg font-bold text-gray-800">Keputusan Live Daripada Cloud</h2>
-                        <p class="text-xs text-gray-500">Kedudukan markah terkumpul daripada Google Sheets</p>
+                        <h2 class="text-lg font-bold text-gray-800">Kedudukan & Pecahan Markah Kumpulan</h2>
+                        <p class="text-xs text-gray-500">Pecahan markah setiap hakim dan Jumlah Markah Keseluruhan (/300)</p>
                     </div>
                     <button onclick="muatTurunDataSheets()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">
-                        🔄 Muat Semula Data
+                        🔄 Muat Semula
                     </button>
                 </div>
 
@@ -226,20 +242,18 @@
                     <table class="w-full text-left text-sm">
                         <thead>
                             <tr class="bg-gray-100 text-gray-700 text-xs font-bold uppercase">
-                                <th class="p-3">Ked.</th>
-                                <th class="p-3">Kumpulan</th>
-                                <th class="p-3">Tajuk Projek</th>
-                                <th class="p-3 text-center">Ahli</th>
-                                <th class="p-3">Penilai</th>
+                                <th class="p-3 text-center">Ked.</th>
+                                <th class="p-3">Kumpulan & Tajuk</th>
+                                <th class="p-3">Pecahan Markah Hakim</th>
                                 <th class="p-3 text-right">Jumlah Markah</th>
                             </tr>
                         </thead>
                         <tbody id="jadual-body" class="divide-y divide-gray-100">
-                            <!-- Populated via Google Sheets -->
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
                     <div id="loading-txt" class="text-center py-8 text-gray-400 text-sm">
-                        Sedang mengambil data dari Google Sheets...
+                        Sedang mengambil data terkini dari Cloud...
                     </div>
                 </div>
             </div>
@@ -248,8 +262,27 @@
     </main>
 
     <script>
-        // ⚠️ TUKAR URL INI DENGAN URL WEB APP GOOGLE SCRIPT ANDA!
+        // ⚠️ MASUKKAN URL WEB APP GOOGLE SCRIPT ANDA DI SINI
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxa2FIINHnydtJiXweG42n4nrbW4Dz9fEWXCrgBV_xKun6nSVyZnmFzb_wJ7dfQuD84/exec";
+
+        // Senarai Kumpulan & Tajuk Projek (Hardcoded)
+        const SENARAI_KUMPULAN = {
+            "Kumpulan 1": "THE SPRINGROAD",
+            "Kumpulan 2": "SMART TRAST BIN",
+            "Kumpulan 3": "SORTIFY",
+            "Kumpulan 4": "TSOLAR FAN X300",
+            "Kumpulan 5": "PASU PENANAMAN TUMBUHAN AUTOMATIK (PPTA)"
+        };
+
+        function pilihKumpulanAuto() {
+            const selected = document.getElementById('nama-kumpulan').value;
+            const inputTajuk = document.getElementById('tajuk-projek');
+            if (selected && SENARAI_KUMPULAN[selected]) {
+                inputTajuk.value = SENARAI_KUMPULAN[selected];
+            } else {
+                inputTajuk.value = '';
+            }
+        }
 
         function tukarTab(tab) {
             const tabPengisian = document.getElementById('tab-pengisian');
@@ -288,18 +321,17 @@
         }
 
         function hantarKeGoogleSheet() {
-            const namaPenilai = document.getElementById('nama-penilai').value.trim();
-            const namaKumpulan = document.getElementById('nama-kumpulan').value.trim();
+            const namaPenilai = document.getElementById('nama-penilai').value;
+            const namaKumpulan = document.getElementById('nama-kumpulan').value;
             const bilAhli = document.getElementById('bil-ahli').value || 0;
-            const tajukProjek = document.getElementById('tajuk-projek').value.trim();
+            const tajukProjek = document.getElementById('tajuk-projek').value;
 
-            if (!namaKumpulan || !tajukProjek) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Maklumat Belum Lengkap',
-                    text: 'Sila masukkan Nama Kumpulan dan Tajuk Projek terlebih dahulu!',
-                    confirmButtonColor: '#2563eb'
-                });
+            if (!namaPenilai) {
+                Swal.fire({ icon: 'warning', title: 'Sila Pilih Nama Penilai', text: 'Sila pilih nama hakim terlebih dahulu!', confirmButtonColor: '#2563eb' });
+                return;
+            }
+            if (!namaKumpulan) {
+                Swal.fire({ icon: 'warning', title: 'Sila Pilih Kumpulan', text: 'Sila pilih kumpulan yang dinilai!', confirmButtonColor: '#2563eb' });
                 return;
             }
 
@@ -310,7 +342,7 @@
             });
 
             const payload = {
-                penilai: namaPenilai || 'N/A',
+                penilai: namaPenilai,
                 kumpulan: namaKumpulan,
                 ahli: bilAhli,
                 projek: tajukProjek,
@@ -325,12 +357,10 @@
 
             Swal.fire({
                 title: 'Menghantar Markah...',
-                text: 'Sila tunggu sebentar, data sedang dihantar ke Cloud Google Sheets.',
+                text: 'Sila tunggu sebentar, data sedang disimpan ke Cloud Google Sheets.',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => { Swal.showLoading(); }
             });
 
             fetch(GOOGLE_SCRIPT_URL, {
@@ -343,14 +373,15 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Pemarkahan Berjaya Dihantar!',
-                    text: `Markah bagi ${namaKumpulan} telah selamat disimpan ke Cloud Google Sheets.`,
-                    confirmButtonText: 'Lihat Keputusan Terkini',
+                    text: `Markah bagi ${namaKumpulan} telah selamat disimpan.`,
+                    confirmButtonText: 'Lihat Keputusan Markah',
                     confirmButtonColor: '#16a34a'
                 }).then(() => {
                     document.getElementById('borang-markah').reset();
                     document.getElementById('nama-kumpulan').value = '';
-                    document.getElementById('bil-ahli').value = '';
+                    document.getElementById('nama-penilai').value = '';
                     document.getElementById('tajuk-projek').value = '';
+                    document.getElementById('bil-ahli').value = '';
                     kiraJumlah();
                     tukarTab('jumlah');
                 });
@@ -359,7 +390,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Penghantaran Gagal!',
-                    text: 'Ralat berlaku semasa menyambung ke Cloud. Sila semak sambungan internet anda.',
+                    text: 'Ralat berlaku. Sila pastikan anda terhubung ke internet.',
                     confirmButtonColor: '#dc2626'
                 });
             });
@@ -375,38 +406,82 @@
             .then(res => res.json())
             .then(data => {
                 loading.style.display = 'none';
-                
-                if(!data || data.length === 0) {
-                    loading.innerText = "Belum ada rekod pemarkahan dimasukkan dalam Google Sheets.";
-                    loading.style.display = 'block';
-                    return;
+
+                // Inisialisasi struktur simpanan markah 5 Kumpulan
+                let ringkasan = {};
+                Object.keys(SENARAI_KUMPULAN).forEach(k => {
+                    ringkasan[k] = {
+                        kumpulan: k,
+                        projek: SENARAI_KUMPULAN[k],
+                        skorHakim: []
+                    };
+                });
+
+                // Masukkan markah dari Google Sheet mengikut kumpulan
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        if (ringkasan[item.kumpulan]) {
+                            ringkasan[item.kumpulan].skorHakim.push(parseFloat(item.jumlah) || 0);
+                        }
+                    });
                 }
 
-                // Susun ikut markah tertinggi
-                data.sort((a, b) => b.jumlah - a.jumlah);
+                // Susun dan format data untuk paparan
+                let jadualArray = Object.values(ringkasan).map(item => {
+                    let h1 = item.skorHakim[0] !== undefined ? item.skorHakim[0] : null;
+                    let h2 = item.skorHakim[1] !== undefined ? item.skorHakim[1] : null;
+                    let h3 = item.skorHakim[2] !== undefined ? item.skorHakim[2] : null;
 
-                data.forEach((item, index) => {
+                    let total300 = (h1 || 0) + (h2 || 0) + (h3 || 0);
+
+                    return {
+                        ...item,
+                        h1: h1,
+                        h2: h2,
+                        h3: h3,
+                        total300: total300,
+                        bilHakim: item.skorHakim.length
+                    };
+                });
+
+                // Susun kedudukan berdasarkan Jumlah Markah Keseluruhan /300 (Tertinggi ke Terendah)
+                jadualArray.sort((a, b) => b.total300 - a.total300);
+
+                jadualArray.forEach((item, index) => {
                     let tr = document.createElement('tr');
                     tr.className = "hover:bg-gray-50 border-b border-gray-100";
                     
                     let pingat = index + 1;
-                    if(index === 0) pingat = '🥇';
-                    if(index === 1) pingat = '🥈';
-                    if(index === 2) pingat = '🥉';
+                    if(index === 0 && item.bilHakim > 0) pingat = '🥇';
+                    if(index === 1 && item.bilHakim > 0) pingat = '🥈';
+                    if(index === 2 && item.bilHakim > 0) pingat = '🥉';
+
+                    let h1Txt = item.h1 !== null ? `${item.h1}` : '<span class="text-gray-300">-</span>';
+                    let h2Txt = item.h2 !== null ? `${item.h2}` : '<span class="text-gray-300">-</span>';
+                    let h3Txt = item.h3 !== null ? `${item.h3}` : '<span class="text-gray-300">-</span>';
 
                     tr.innerHTML = `
-                        <td class="p-3 text-md font-bold">${pingat}</td>
-                        <td class="p-3 font-bold text-gray-900">${item.kumpulan}</td>
-                        <td class="p-3 text-xs text-gray-600">${item.projek}</td>
-                        <td class="p-3 text-center text-xs">${item.ahli}</td>
-                        <td class="p-3 text-xs text-gray-500">${item.penilai}</td>
-                        <td class="p-3 text-right font-black text-blue-700 text-base">${item.jumlah}</td>
+                        <td class="p-3 text-md font-bold text-center">${pingat}</td>
+                        <td class="p-3">
+                            <div class="font-bold text-gray-900">${item.kumpulan}</div>
+                            <div class="text-xs text-gray-500">${item.projek}</div>
+                        </td>
+                        <td class="p-3 text-xs">
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-gray-100 border border-gray-200 px-2.5 py-1 rounded-lg font-medium text-gray-700">Hakim 1: <b class="text-blue-700">${h1Txt}</b></span>
+                                <span class="bg-gray-100 border border-gray-200 px-2.5 py-1 rounded-lg font-medium text-gray-700">Hakim 2: <b class="text-blue-700">${h2Txt}</b></span>
+                                <span class="bg-gray-100 border border-gray-200 px-2.5 py-1 rounded-lg font-medium text-gray-700">Hakim 3: <b class="text-blue-700">${h3Txt}</b></span>
+                            </div>
+                        </td>
+                        <td class="p-3 text-right font-black text-emerald-700 text-base whitespace-nowrap">
+                            ${item.total300} <span class="text-xs font-normal text-gray-400">/ 300</span>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
             })
             .catch(err => {
-                loading.innerText = "Gagal memuat turun data. Sila pastikan tetapan 'Who has access' di Google Apps Script telah set kepada 'Anyone'.";
+                loading.innerText = "Gagal memuat turun data. Sila semak sambungan internet atau URL Google Apps Script Anda.";
             });
         }
     </script>
